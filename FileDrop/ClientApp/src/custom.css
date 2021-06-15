@@ -12,3 +12,12 @@ code {
   background-color: #1b6ec2;
   border-color: #1861ac;
 }
+.loader-center {
+    margin-left: 47%;
+}
+.grid-table {
+    margin-left: 15% !important;
+    margin-right: 15% !important;
+    max-width: 100% !important;
+    width: 70% !important;
+}

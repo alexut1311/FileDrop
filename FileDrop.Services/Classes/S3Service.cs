@@ -261,7 +261,6 @@ namespace FileDrop.Services.Classes
          }
       }
 
-      //Good upload
       public async Task<AddFileResponse> UploadFilesAsync(string bucketName, IList<IFormFile> formFiles)
       {
          try

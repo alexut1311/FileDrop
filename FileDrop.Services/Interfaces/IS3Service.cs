@@ -10,7 +10,6 @@ namespace FileDrop.Services.Interfaces
       Task<S3Response> CreateBucketAsync(string bucketName);
       Task<S3Response> GetFileWithoutPathAsync(string bucketName, string fileName);
       Task<IList<S3ObjectModel>> ListObjectsAsync(string bucketName);
-      //Good upload
       Task<AddFileResponse> UploadFilesAsync(string bucketName, IList<IFormFile> formFiles);
       Task<S3Response> DeleteObjectAsync(string bucketName, string fileName);
       Task<IList<S3BucketModel>> ListBucketsAsync();

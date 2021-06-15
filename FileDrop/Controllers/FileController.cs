@@ -26,6 +26,7 @@ namespace FileDrop.Controllers
          var ceva = await _s3Logic.GetFilesByBucketNameAsync("create-bucket-api-test6");
          return new List<FileViewModel> {
             new FileViewModel {
+               Id=1,
                FileName = "text.txt", 
                FileSize = "15 de mega" 
             } 

@@ -1,4 +1,12 @@
 ﻿import React, { Component } from 'react';
+import { Loader } from './Loader';
+import DataGrid, {
+   Column,
+   Selection,
+   FilterRow,
+   Paging,
+   ColumnChooser
+} from 'devextreme-react/data-grid';
 
 export class FetchFiles extends Component {
    static displayName = FetchFiles.name;
@@ -6,35 +14,58 @@ export class FetchFiles extends Component {
    constructor(props) {
       super(props);
       this.state = { files: [], loading: true };
+      this.onToolbarPreparing = this.onToolbarPreparing.bind(this);
    }
 
    componentDidMount() {
-      this.populateWeatherData();
+      this.getFiles();
    }
 
-   static renderFilesTable(files) {
+   onToolbarPreparing(e) {
+      e.toolbarOptions.items.push({
+         widget: 'dxButton',
+         location: 'before',
+         visible: true,
+         options: {
+            icon: 'upload',
+            text: 'Upload',
+            disabled: false,
+            elementAttr: {
+               id: 'uploadButton',
+            },
+            onClick: function () {
+               console.log("upload")
+            }
+         },
+      });
+   }
+
+   renderFilesTable = (files)=> {
       return (
-         <table className='table table-striped' aria-labelledby="tabelLabel">
-            <thead>
-               <tr>
-                  <th>File Name</th>
-                  <th>File Size</th>
-               </tr>
-            </thead>
-            <tbody>
-               {files.map(file =>
-                  <tr key={file.fileName}>
-                     <td>{file.fileName}</td>
-                     <td>{file.fileSize}</td>
-                  </tr>
-               )}
-            </tbody>
-         </table>
+         <DataGrid id="gridContainer"
+            dataSource={files}
+            showBorders={true}
+            keyExpr="id"
+            onToolbarPreparing={this.onToolbarPreparing}
+         >
+            <Selection
+               mode="multiple"
+               selectAllMode="allPages"
+               showCheckBoxesMode="always"
+            />
+            <FilterRow visible={true} />
+            <Paging defaultPageSize={10} />
+            <ColumnChooser enabled={true} />
+            <Column dataField="fileName" caption="Name" />
+            <Column dataField="fileSize" caption="Size" />
+         </DataGrid>
       );
    }
 
    render() {
-      let contents = this.state.loading ? <p><em>Loading...</em></p> : FetchFiles.renderFilesTable(this.state.files);
+      let contents = this.state.loading ?
+         <Loader />
+         : this.renderFilesTable(this.state.files);
 
       return (
          <div>
@@ -44,7 +75,7 @@ export class FetchFiles extends Component {
       );
    }
 
-   async populateWeatherData() {
+   async getFiles() {
       const response = await fetch('file/GetFiles');
       const data = await response.json();
       this.setState({ files: data, loading: false });
