@@ -6,11 +6,9 @@ using FileDrop.Services.Interfaces;
 using FileDrop.TL.Helpers;
 using FileDrop.TL.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -170,7 +168,7 @@ namespace FileDrop.Services.Classes
                {
                   Message = "Please check the provided AWS Credentials",
                   File = response.ResponseStream,
-                  ContentType= response.Headers.ContentType,
+                  ContentType = response.Headers.ContentType,
                   StatusCode = HttpStatusCode.OK
                };
             }
@@ -330,6 +328,6 @@ namespace FileDrop.Services.Classes
 
       #endregion
 
-      
+
    }
 }

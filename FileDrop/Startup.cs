@@ -8,7 +8,6 @@ using FileDrop.Services.Classes;
 using FileDrop.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -68,7 +67,7 @@ namespace FileDrop
          app.UseHttpsRedirection();
          app.UseStaticFiles();
          app.UseSpaStaticFiles();
-         
+
          app.UseRouting();
 
          app.UseEndpoints(endpoints =>

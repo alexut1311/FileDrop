@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace FileDrop.BL
+﻿namespace FileDrop.BL
 {
    public class Class1
    {

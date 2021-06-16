@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FileDrop.TL.Models
+﻿namespace FileDrop.TL.Models
 {
    public class S3ObjectModel
    {

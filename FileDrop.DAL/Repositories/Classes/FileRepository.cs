@@ -1,11 +1,8 @@
 ﻿using FileDrop.DAL.Entities;
 using FileDrop.DAL.Repositories.Interfaces;
 using FileDrop.TL;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileDrop.DAL.Repositories.Classes
 {
@@ -20,7 +17,7 @@ namespace FileDrop.DAL.Repositories.Classes
 
       public void AddFile(FileDTO fileDTO)
       {
-         var existingFile = _applicationDBContext.Files.FirstOrDefault(x => x.FileName == fileDTO.FileName && x.UserId == fileDTO.UserId);
+         CloudFile existingFile = _applicationDBContext.Files.FirstOrDefault(x => x.FileName == fileDTO.FileName && x.UserId == fileDTO.UserId);
          if (existingFile != null)
          {
             existingFile.FileSize = fileDTO.FileSize;
@@ -30,7 +27,7 @@ namespace FileDrop.DAL.Repositories.Classes
          }
          else
          {
-            var newFile = new CloudFile
+            CloudFile newFile = new CloudFile
             {
                FileName = fileDTO.FileName,
                FileSize = fileDTO.FileSize,

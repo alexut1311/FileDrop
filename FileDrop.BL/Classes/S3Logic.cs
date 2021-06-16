@@ -2,15 +2,12 @@
 using FileDrop.Services.Interfaces;
 using FileDrop.TL.Models;
 using Microsoft.AspNetCore.Http;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FileDrop.BL.Classes
 {
-   public class S3Logic: IS3Logic
+   public class S3Logic : IS3Logic
    {
       private readonly IS3Service _s3Service;
 

@@ -1,5 +1,4 @@
 ﻿using FileDrop.BL.Interfaces;
-using FileDrop.Models;
 using FileDrop.TL;
 using FileDrop.TL.Helpers;
 using FileDrop.TL.Models;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -20,7 +18,7 @@ namespace FileDrop.Controllers
    {
       private readonly IS3Logic _s3Logic;
       private readonly IFileLogic _fileLogic;
-      private readonly static string bucketName = "create-bucket-api-test6";
+      private static readonly string bucketName = "create-bucket-api-test6";
 
       public FileController(IS3Logic s3Logic, IFileLogic fileLogic)
       {
@@ -42,8 +40,8 @@ namespace FileDrop.Controllers
       {
          List<IFormFile> files = Request.Form.Files.ToList();
          //Files are uploaded asynchronous, so they are uploaded one file per thread
-         var result = await _s3Logic.UploadFilesAsync(bucketName, files);
-         var file = files.FirstOrDefault();
+         AddFileResponse result = await _s3Logic.UploadFilesAsync(bucketName, files);
+         IFormFile file = files.FirstOrDefault();
          if (result.StatusCode == HttpStatusCode.OK)
          {
             FileDTO fileDTO = new FileDTO
@@ -64,7 +62,7 @@ namespace FileDrop.Controllers
       [Route("DownloadFiles")]
       public async Task<IActionResult> DownloadFiles(string fileName)
       {
-         var result = await _s3Logic.GetFileWithoutPathAsync(bucketName, fileName);
+         S3Response result = await _s3Logic.GetFileWithoutPathAsync(bucketName, fileName);
 
          return File(result.File, "application/octet-stream", fileName);
       }
