@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FileDrop.DAL\FileDrop.DAL.csproj" />
     <ProjectReference Include="..\FileDrop.Services\FileDrop.Services.csproj" />
   </ItemGroup>
 

@@ -1,6 +1,7 @@
 using Amazon.S3;
 using FileDrop.BL.Classes;
 using FileDrop.BL.Interfaces;
+using FileDrop.DAL;
 using FileDrop.DAL.Repositories.Classes;
 using FileDrop.DAL.Repositories.Interfaces;
 using FileDrop.Services.Classes;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,7 +32,11 @@ namespace FileDrop
          services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
          services.AddAWSService<IAmazonS3>();
 
+         string connectionString = "Server=DESKTOP-CLJCC9A\\SQLEXPRESS;Database=FileDropDb;Trusted_Connection=True;MultipleActiveResultSets=true";
+         services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(connectionString));
+
          services.AddTransient<IS3Logic, S3Logic>();
+         services.AddTransient<IFileLogic, FileLogic>();
 
          services.AddSingleton<IS3Service, S3Service>();
 
@@ -62,7 +68,7 @@ namespace FileDrop
          app.UseHttpsRedirection();
          app.UseStaticFiles();
          app.UseSpaStaticFiles();
-
+         
          app.UseRouting();
 
          app.UseEndpoints(endpoints =>

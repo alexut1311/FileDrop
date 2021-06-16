@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileDrop.DAL.Repositories.Interfaces
+namespace FileDrop.BL.Interfaces
 {
-   public interface IFileRepository
+   public interface IFileLogic
    {
-      void AddFile(FileDTO fileDTO);
+      void AddFileToDB(FileDTO fileDTO);
       IList<FileDTO> GetAllFiles();
    }
 }

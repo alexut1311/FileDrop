@@ -3,8 +3,10 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Amazon.S3.Util;
 using FileDrop.Services.Interfaces;
+using FileDrop.TL.Helpers;
 using FileDrop.TL.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,11 +18,6 @@ namespace FileDrop.Services.Classes
 {
    public class S3Service : IS3Service
    {
-      #region Static Members
-
-      private static readonly string[] SUFFIXES = { "Bytes", "KB", "MB", "GB", "TB", "PB" };
-
-      #endregion
 
       #region Members
 
@@ -163,22 +160,20 @@ namespace FileDrop.Services.Classes
 
             GetObjectRequest request = new GetObjectRequest() { BucketName = bucketName, Key = keyName };
 
-            string responseBody;
-
             using (GetObjectResponse response = await _client.GetObjectAsync(request))
-            using (Stream responseStream = response.ResponseStream)
-            using (StreamReader reader = new StreamReader(responseStream))
             {
-               string title = response.Metadata["x-amz-meta-title"];
-               string contentType = response.Headers["Content-Type"];
-
-               Console.WriteLine($"Object meta, Title: {title}");
-               Console.WriteLine($"Content type: {contentType}");
-
-               responseBody = reader.ReadToEnd();
+               if (response.ResponseStream == null)
+               {
+                  return null;
+               }
+               return new S3Response()
+               {
+                  Message = "Please check the provided AWS Credentials",
+                  File = response.ResponseStream,
+                  ContentType= response.Headers.ContentType,
+                  StatusCode = HttpStatusCode.OK
+               };
             }
-
-            return new S3Response() { Message = $"File downloaded successfully", StatusCode = HttpStatusCode.OK };
          }
          catch (AmazonS3Exception amazonS3Exception)
          {
@@ -202,7 +197,6 @@ namespace FileDrop.Services.Classes
             return new S3Response() { Message = e.Message, StatusCode = HttpStatusCode.InternalServerError };
          }
       }
-
       public async Task<IList<S3BucketModel>> ListBucketsAsync()
       {
          ListBucketsResponse response = await _client.ListBucketsAsync();
@@ -234,7 +228,7 @@ namespace FileDrop.Services.Classes
                {
                   Id = i,
                   Name = entry.Key,
-                  Size = FormatSize(entry.Size),
+                  Size = FileHelper.FormatSize(entry.Size),
                   LastModified = entry.LastModified.ToString(CultureInfo.InvariantCulture),
                   OwnerDisplayName = entry.Owner.DisplayName,
                   OwnerId = entry.Owner.Id,
@@ -336,21 +330,6 @@ namespace FileDrop.Services.Classes
 
       #endregion
 
-      #region Methods - Private
-
-      private static string FormatSize(long bytes)
-      {
-         int counter = 0;
-         decimal number = bytes;
-         while (Math.Round(number / 1024) >= 1)
-         {
-            number /= 1024;
-            counter++;
-         }
-
-         return $"{number:n1} {SUFFIXES[counter]}";
-      }
-
-      #endregion
+      
    }
 }

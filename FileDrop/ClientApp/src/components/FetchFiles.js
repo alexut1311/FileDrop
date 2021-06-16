@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import { Loader } from './Loader';
+import { UploadPopUp } from './UploadPopUp';
 import DataGrid, {
    Column,
    Selection,
@@ -7,21 +8,61 @@ import DataGrid, {
    Paging,
    ColumnChooser
 } from 'devextreme-react/data-grid';
+import $ from 'jquery';
 
 export class FetchFiles extends Component {
-   static displayName = FetchFiles.name;
-
    constructor(props) {
       super(props);
-      this.state = { files: [], loading: true };
+      this.state = { files: [], selectedFiles: [], loading: true, uploadPopupVisible: false, areSelectedFiles: false };
+      this.closeButtonOptions = {
+         text: 'Close',
+         onClick: this.hideInfo
+      };
+      this.dataGrid = null;
       this.onToolbarPreparing = this.onToolbarPreparing.bind(this);
+      this.hideUploadPopup = this.hideUploadPopup.bind(this);
+      this.refreshDataGrid = this.refreshDataGrid.bind(this);
    }
 
    componentDidMount() {
       this.getFiles();
    }
 
+   hideUploadPopup() {
+      this.setState({
+         uploadPopupVisible: false
+      });
+   }
+
+   showUploadPopup = () => {
+      this.setState({
+         uploadPopupVisible: true
+      });
+   }
+
+   downloadFiles = () => {
+      debugger;
+      document.location = this.state.selectedFiles[0].previewURL
+
+      this.setState({
+         areSelectedFiles: false,
+         selectedFiles:[]
+      });
+
+      this.dataGrid.instance.deselectRows(this.dataGrid.instance.getSelectedRowKeys())
+   }
+
+   onSelectionChanged = (e) => {
+      debugger;
+      this.setState({
+         areSelectedFiles: e.selectedRowKeys.length !== 0,
+         selectedFiles: e.component.getSelectedRowsData()
+      });
+      this.dataGrid.instance.refresh();
+   }
+
    onToolbarPreparing(e) {
+      debugger;
       e.toolbarOptions.items.push({
          widget: 'dxButton',
          location: 'before',
@@ -33,51 +74,80 @@ export class FetchFiles extends Component {
             elementAttr: {
                id: 'uploadButton',
             },
-            onClick: function () {
-               console.log("upload")
-            }
+            onClick: this.showUploadPopup
          },
-      });
+      },
+         {
+            widget: 'dxButton',
+            location: 'before',
+            visible: true,
+            options: {
+               icon: 'download',
+               text: 'Download',
+               disabled: false,
+               elementAttr: {
+                  id: 'downloadButton',
+               },
+               onClick: this.downloadFiles
+            },
+         }
+      );
    }
+refreshDataGrid(e) {
+   this.dataGrid.instance.refresh();
+   this.state.loading = true;
+   this.getFiles();
+}
 
-   renderFilesTable = (files)=> {
-      return (
+renderFilesTable = (files) => {
+   return (
+      <div>
+         <UploadPopUp
+            uploadPopupVisible={this.state.uploadPopupVisible}
+            hideUploadPopup={this.hideUploadPopup}
+            refreshDataGrid={this.refreshDataGrid}
+         />
          <DataGrid id="gridContainer"
+            ref={(ref) => this.dataGrid = ref}
             dataSource={files}
             showBorders={true}
             keyExpr="id"
             onToolbarPreparing={this.onToolbarPreparing}
+            onSelectionChanged={this.onSelectionChanged}
          >
             <Selection
-               mode="multiple"
+               mode="single"
                selectAllMode="allPages"
                showCheckBoxesMode="always"
             />
             <FilterRow visible={true} />
-            <Paging defaultPageSize={10} />
+            <Paging defaultPageSize={30} />
             <ColumnChooser enabled={true} />
             <Column dataField="fileName" caption="Name" />
             <Column dataField="fileSize" caption="Size" />
+            <Column dataField="uploadDate" caption="LastModified" />
+            <Column dataField="storageClass" caption="StorageClass" />
          </DataGrid>
-      );
-   }
+      </div>
+   );
+}
 
-   render() {
-      let contents = this.state.loading ?
-         <Loader />
-         : this.renderFilesTable(this.state.files);
+render() {
+   let contents = this.state.loading ?
+      <Loader />
+      : this.renderFilesTable(this.state.files);
 
-      return (
-         <div>
-            <h1 id="filesLabel">Files</h1>
-            {contents}
-         </div>
-      );
-   }
+   return (
+      <div>
+         <h1 id="filesLabel">Files</h1>
+         {contents}
+      </div>
+   );
+}
 
-   async getFiles() {
-      const response = await fetch('file/GetFiles');
-      const data = await response.json();
-      this.setState({ files: data, loading: false });
-   }
+async getFiles() {
+   const response = await fetch('file/GetFiles');
+   const data = await response.json();
+   this.setState({ files: data, loading: false });
+}
 }
