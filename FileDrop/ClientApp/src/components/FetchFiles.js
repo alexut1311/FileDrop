@@ -46,10 +46,11 @@ export class FetchFiles extends Component {
 
       this.setState({
          areSelectedFiles: false,
-         selectedFiles:[]
+         selectedFiles: []
       });
-
-      this.dataGrid.instance.deselectRows(this.dataGrid.instance.getSelectedRowKeys())
+      if (this.dataGrid) {
+         this.dataGrid.instance.deselectRows(this.dataGrid.instance.getSelectedRowKeys())
+      }
    }
 
    onSelectionChanged = (e) => {
@@ -58,7 +59,9 @@ export class FetchFiles extends Component {
          areSelectedFiles: e.selectedRowKeys.length !== 0,
          selectedFiles: e.component.getSelectedRowsData()
       });
-      this.dataGrid.instance.refresh();
+      if (this.dataGrid) {
+         this.dataGrid.instance.refresh();
+      }
    }
 
    onToolbarPreparing(e) {
@@ -93,61 +96,63 @@ export class FetchFiles extends Component {
          }
       );
    }
-refreshDataGrid(e) {
-   this.dataGrid.instance.refresh();
-   this.state.loading = true;
-   this.getFiles();
-}
+   refreshDataGrid(e) {
+      if (this.dataGrid) {
+         this.dataGrid.instance.refresh();
+      }
+      this.state.loading = true;
+      this.getFiles();
+   }
 
-renderFilesTable = (files) => {
-   return (
-      <div>
-         <UploadPopUp
-            uploadPopupVisible={this.state.uploadPopupVisible}
-            hideUploadPopup={this.hideUploadPopup}
-            refreshDataGrid={this.refreshDataGrid}
-         />
-         <DataGrid id="gridContainer"
-            ref={(ref) => this.dataGrid = ref}
-            dataSource={files}
-            showBorders={true}
-            keyExpr="id"
-            onToolbarPreparing={this.onToolbarPreparing}
-            onSelectionChanged={this.onSelectionChanged}
-         >
-            <Selection
-               mode="single"
-               selectAllMode="allPages"
-               showCheckBoxesMode="always"
+   renderFilesTable = (files) => {
+      return (
+         <div>
+            <UploadPopUp
+               uploadPopupVisible={this.state.uploadPopupVisible}
+               hideUploadPopup={this.hideUploadPopup}
+               refreshDataGrid={this.refreshDataGrid}
             />
-            <FilterRow visible={true} />
-            <Paging defaultPageSize={30} />
-            <ColumnChooser enabled={true} />
-            <Column dataField="fileName" caption="Name" />
-            <Column dataField="fileSize" caption="Size" />
-            <Column dataField="uploadDate" caption="LastModified" />
-            <Column dataField="storageClass" caption="StorageClass" />
-         </DataGrid>
-      </div>
-   );
-}
+            <DataGrid id="gridContainer"
+               ref={(ref) => this.dataGrid = ref}
+               dataSource={files}
+               showBorders={true}
+               keyExpr="id"
+               onToolbarPreparing={this.onToolbarPreparing}
+               onSelectionChanged={this.onSelectionChanged}
+            >
+               <Selection
+                  mode="single"
+                  selectAllMode="allPages"
+                  showCheckBoxesMode="always"
+               />
+               <FilterRow visible={true} />
+               <Paging defaultPageSize={30} />
+               <ColumnChooser enabled={true} />
+               <Column dataField="fileName" caption="Name" />
+               <Column dataField="fileSize" caption="Size" />
+               <Column dataField="uploadDate" caption="LastModified" />
+               <Column dataField="storageClass" caption="StorageClass" />
+            </DataGrid>
+         </div>
+      );
+   }
 
-render() {
-   let contents = this.state.loading ?
-      <Loader />
-      : this.renderFilesTable(this.state.files);
+   render() {
+      let contents = this.state.loading ?
+         <Loader />
+         : this.renderFilesTable(this.state.files);
 
-   return (
-      <div>
-         <h1 id="filesLabel">Files</h1>
-         {contents}
-      </div>
-   );
-}
+      return (
+         <div>
+            <h1 id="filesLabel">Files</h1>
+            {contents}
+         </div>
+      );
+   }
 
-async getFiles() {
-   const response = await fetch('file/GetFiles');
-   const data = await response.json();
-   this.setState({ files: data, loading: false });
-}
+   async getFiles() {
+      const response = await fetch('file/GetFiles');
+      const data = await response.json();
+      this.setState({ files: data, loading: false });
+   }
 }

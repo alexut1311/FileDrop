@@ -1,6 +1,8 @@
 using Amazon.S3;
 using FileDrop.BL.Classes;
 using FileDrop.BL.Interfaces;
+using FileDrop.ControllerHelpers.Classes;
+using FileDrop.ControllerHelpers.Interfaces;
 using FileDrop.DAL;
 using FileDrop.DAL.Repositories.Classes;
 using FileDrop.DAL.Repositories.Interfaces;
@@ -41,7 +43,9 @@ namespace FileDrop
 
          services.AddTransient<IFileRepository, FileRepository>();
 
-         services.AddControllersWithViews();
+         services.AddTransient<IAccountControllerHelper, AccountControllerHelper>();
+
+         services.AddControllersWithViews().AddNewtonsoftJson();
 
          // In production, the React files will be served from this directory
          services.AddSpaStaticFiles(configuration =>

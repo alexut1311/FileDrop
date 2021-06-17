@@ -1,0 +1,27 @@
+﻿.root{
+    height:100vh;
+}
+.paper{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:78px;
+}
+.avatar {
+    background-color: #f48fb1;
+}
+.form{
+    width:100%
+}
+.submit{
+
+}
+.login-background {
+    background-color: #e6dfdf;
+}
+.image {
+    background-image: url("https://source.unsplash.com/user/alex_serban7/likes");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: inherit;
+}
