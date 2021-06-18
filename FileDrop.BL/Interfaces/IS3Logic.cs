@@ -10,5 +10,6 @@ namespace FileDrop.BL.Interfaces
       Task<IList<S3ObjectModel>> GetFilesByBucketNameAsync(string bucketName);
       Task<AddFileResponse> UploadFilesAsync(string bucketName, IList<IFormFile> formFiles);
       Task<S3Response> GetFileWithoutPathAsync(string bucketName, string fileName);
+      Task<S3Response> CreateUserBucketAsync(string accountUsername);
    }
 }

@@ -8,6 +8,7 @@ import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
+import { LoadIndicator } from 'devextreme-react/load-indicator';
 import './Login.css';
 
 export class Login extends Component {
@@ -18,22 +19,58 @@ export class Login extends Component {
 
    async handleSubmit(event) {
       event.preventDefault();
-      debugger;
       let accountViewModel = {
-         userName: document.getElementById("username").value,
+         username: document.getElementById("username").value,
          password: document.getElementById("password").value
       }
-      const response = await fetch("https://localhost:44322/account/login", {
-         method:'POST',
+      this.showLoader();
+      this.hideErrorMessage();
+      fetch("https://localhost:44322/account/login", {
+         method: 'POST',
          headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
          },
          body: JSON.stringify(accountViewModel)
-      });
-      const data = await response.json();
+      }).then((response) => response.json())
+         .then((responseJson) => {
+            console.log("then")
+            this.hideLoader()
+            if (!responseJson.isCompletedSuccesfully) {
+               if (responseJson.statusCode !== 500) {
+                  this.showErrorMessage(responseJson.message)
+               }
+            } else {
+               this.props.userLogin();
+            }
+            console.error(responseJson);
+         })
+         .catch((error) => {
+            this.hideLoader()
+            console.log("catch")
+            this.showErrorMessage("Something bad happened, try reloading the page.")
+            console.error(error);
+         });
    }
-   
+
+   showLoader() {
+      var element = document.getElementById("loader");
+      element.classList.remove("d-none");
+   }
+
+   hideLoader() {
+      var element = document.getElementById("loader");
+      element.classList.add("d-none");
+   }
+
+   showErrorMessage(message) {
+      document.getElementById("errorMessage").innerText = message;
+   }
+
+   hideErrorMessage() {
+      document.getElementById("errorMessage").innerText = '';
+   }
+
    render() {
       return (
          <Grid container component="main" className="root">
@@ -87,6 +124,10 @@ export class Login extends Component {
                         </Grid>
                      </Grid>
                      <Box mt={5}>
+                        <div id="loader" className="d-none">
+                           <LoadIndicator className="d-flex justify-content-center loader-center " id="large-indicator" height={40} width={40} />
+                        </div>
+                        <p className="error" id="errorMessage"></p>
                         <Typography variant="body2" color="textSecondary" align="center">
                            {'Copyright © '}
                            <Link color="inherit" href="https://localhost:44322/">

@@ -25,3 +25,21 @@
     background-size: cover;
     background-position: inherit;
 }
+.margin-left-40{
+    margin-left:50px !important;
+}
+.sign-up {
+    width: 810px;
+    margin-left: 50px !important;
+}
+.error{
+    color:red;
+    text-align:center;
+}
+.d-none{
+    display:none;
+}
+.success {
+    color: green;
+    text-align: center;
+}

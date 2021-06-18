@@ -100,7 +100,9 @@ export class FetchFiles extends Component {
       if (this.dataGrid) {
          this.dataGrid.instance.refresh();
       }
-      this.state.loading = true;
+      this.setState({
+         loading: true,
+      });
       this.getFiles();
    }
 

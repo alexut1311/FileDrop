@@ -317,13 +317,9 @@ namespace FileDrop.Services.Classes
 
       #region Methods - Public
 
-      public async Task<S3Response> DoesBucketExists(string bucketName)
+      public async Task<bool> DoesBucketExists(string bucketName)
       {
-         bool check = await AmazonS3Util.DoesS3BucketExistV2Async(_client, bucketName);
-
-         return !check
-            ? new S3Response() { Message = "The bucket does not exist.", StatusCode = HttpStatusCode.NotFound }
-            : new S3Response() { Message = "The bucket exists.", StatusCode = HttpStatusCode.OK };
+         return await AmazonS3Util.DoesS3BucketExistV2Async(_client, bucketName);
       }
 
       #endregion

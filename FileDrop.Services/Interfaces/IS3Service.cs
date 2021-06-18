@@ -14,6 +14,6 @@ namespace FileDrop.Services.Interfaces
       Task<S3Response> DeleteObjectAsync(string bucketName, string fileName);
       Task<IList<S3BucketModel>> ListBucketsAsync();
       Task<S3Response> DeleteBucketAsync(string bucketName);
-      Task<S3Response> DoesBucketExists(string bucketName);
+      Task<bool> DoesBucketExists(string bucketName);
    }
 }

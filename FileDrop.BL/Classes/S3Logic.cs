@@ -16,6 +16,25 @@ namespace FileDrop.BL.Classes
          _s3Service = s3Service;
       }
 
+      public async Task<S3Response> CreateUserBucketAsync(string accountUsername)
+      {
+         int counter = 1;
+         string bucketName = $"file-drop-aws-s3-bucket-{accountUsername}";
+         bool bucketExists = await _s3Service.DoesBucketExists(bucketName);
+         while (bucketExists)
+         {
+            bucketName += counter.ToString();
+            counter++;
+            bucketExists = await _s3Service.DoesBucketExists(bucketName);
+         }
+         S3Response response = await _s3Service.CreateBucketAsync(bucketName);
+         if ((int)response.StatusCode == 200)
+         {
+            response.Message = bucketName;
+         }
+         return response;
+      }
+
       public async Task<IList<S3ObjectModel>> GetFilesByBucketNameAsync(string bucketName)
       {
          if (string.IsNullOrWhiteSpace(bucketName))

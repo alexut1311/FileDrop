@@ -12,26 +12,46 @@ import './custom.css'
 
 export default class App extends Component {
    static displayName = App.name;
-   state = {
-      userJWToken: Cookies.get('fileDropAuthenticationToken'),
-      userRefreshToken: Cookies.get('fileDropAuthenticationRefreshToken'),
-      isUserLoggedIn: false
+   constructor(props) {
+      super(props);
+      this.state = {
+         userJWToken: Cookies.get('fileDropAuthenticationToken'),
+         userRefreshToken: Cookies.get('fileDropAuthenticationRefreshToken'),
+         isUserLoggedIn: false
+      }
+      this.userLogin = this.userLogin.bind(this);
+
+   }
+   
+   componentDidMount() {
+      fetch("https://localhost:44322/account/isUserLoggedIn", {
+         method: 'GET',
+         headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+         },
+      }).then((response) => response.json())
+         .then((responseJson) => {
+            this.setState({
+               isUserLoggedIn: responseJson
+            });
+         })
+         .catch((error) => {
+            console.error(error);
+         });
    }
 
-   componentDidMount() {
-      fetch('animals api path here')
-         .then(result => result.json())
-         .then((data) => {
-            this.setState({ animals: data })
-         })
-         .catch(console.log)
+   userLogin() {
+      this.setState({
+         isUserLoggedIn: true
+      });
    }
 
    render() {
       if (!this.state.isUserLoggedIn) {
          return (
             <div>
-               <Route exact path='/' component={Login} />
+               <Route exact path='/' component={() => (<Login userLogin={this.userLogin} />)}/>
                <Route path='/Register' component={Register} />
             </div>
          );
