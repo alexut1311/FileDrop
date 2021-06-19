@@ -42,9 +42,9 @@ namespace FileDrop.DAL.Repositories.Classes
          _applicationDBContext.SaveChanges();
       }
 
-      public IList<FileDTO> GetAllFiles()
+      public IList<FileDTO> GetAllFiles(int userId)
       {
-         return _applicationDBContext.Files.Select(file => new FileDTO
+         return _applicationDBContext.Files.Where(x => x.UserId == userId).Select(file => new FileDTO
          {
             Id = file.Id,
             FileName = file.FileName,

@@ -20,10 +20,16 @@ export default class App extends Component {
          isUserLoggedIn: false
       }
       this.userLogin = this.userLogin.bind(this);
+      this.userLogout = this.userLogout.bind(this);
 
    }
    
    componentDidMount() {
+      if (this.state.userJWToken && this.state.userRefreshToken) {
+         this.setState({
+            isUserLoggedIn: true
+         });
+      }
       fetch("https://localhost:44322/account/isUserLoggedIn", {
          method: 'GET',
          headers: {
@@ -47,17 +53,27 @@ export default class App extends Component {
       });
    }
 
+   userLogout() {
+      Cookies.remove('fileDropAuthenticationToken');
+      Cookies.remove('fileDropAuthenticationRefreshToken');
+      this.setState({
+         userJWToken: undefined,
+         userRefreshToken: undefined,
+         isUserLoggedIn: false
+      });
+   }
+
    render() {
       if (!this.state.isUserLoggedIn) {
          return (
             <div>
-               <Route exact path='/' component={() => (<Login userLogin={this.userLogin} />)}/>
+               <Route exact path='/' component={() => (<Login userLogin={this.userLogin} />)} />
                <Route path='/Register' component={Register} />
             </div>
          );
       }
       return (
-         <Layout>
+         <Layout isUserLoggedIn={this.state.isUserLoggedIn} userLogout={this.userLogout}>
             <Route exact path='/' component={FetchFiles} />
          </Layout>
       );

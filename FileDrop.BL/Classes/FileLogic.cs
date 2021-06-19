@@ -18,9 +18,9 @@ namespace FileDrop.BL.Classes
          _fileRepository.AddFile(fileDTO);
       }
 
-      public IList<FileDTO> GetAllFiles()
+      public IList<FileDTO> GetAllFiles(int userId)
       {
-         return _fileRepository.GetAllFiles();
+         return _fileRepository.GetAllFiles(userId);
       }
    }
 }

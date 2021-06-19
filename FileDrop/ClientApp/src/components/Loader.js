@@ -3,10 +3,6 @@ import { LoadIndicator } from 'devextreme-react/load-indicator';
 
 export class Loader extends Component {
 
-   constructor(props) {
-      super(props);
-   }
-
    render() {
       return (
          <div>

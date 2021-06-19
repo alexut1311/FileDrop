@@ -67,7 +67,6 @@ export class Register extends Component {
                      this.forceUpdate();
                   }.bind(this), 3000);
             }
-            console.error(responseJson);
          })
          .catch((error) => {
             this.hideLoader()
@@ -214,11 +213,11 @@ export class Register extends Component {
                      >
                         Sign up
                      </Button>
-                     <Grid container>
+                     <Grid container className="sign-in-container">
                         <Grid item xs>
                         </Grid>
-                        <Grid item>
-                           <Link href="/" variant="body2">
+                        <Grid item className="sign-in">
+                           <Link href="/" variant="body2" className="register-sign-in-message">
                               {"You have an account? Sign in instead."}
                            </Link>
                         </Grid>

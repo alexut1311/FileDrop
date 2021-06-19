@@ -43,3 +43,12 @@
     color: green;
     text-align: center;
 }
+
+.sign-in-container .sign-in {
+    margin-top: 10px;
+}
+
+.sign-in .register-sign-in-message {
+    
+    margin-right: 50px;
+}

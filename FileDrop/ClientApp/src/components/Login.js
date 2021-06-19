@@ -13,10 +13,6 @@ import './Login.css';
 
 export class Login extends Component {
 
-   constructor(props) {
-      super(props);
-   }
-
    async handleSubmit(event) {
       event.preventDefault();
       let accountViewModel = {
@@ -43,7 +39,6 @@ export class Login extends Component {
             } else {
                this.props.userLogin();
             }
-            console.error(responseJson);
          })
          .catch((error) => {
             this.hideLoader()
@@ -114,10 +109,10 @@ export class Login extends Component {
                      >
                         Sign In
                      </Button>
-                     <Grid container>
+                     <Grid container className="sign-in-container">
                         <Grid item xs>
                         </Grid>
-                        <Grid item>
+                        <Grid item className="sign-in">
                            <Link href="/Register" variant="body2">
                               {"Don't have an account? Sign Up"}
                            </Link>

@@ -2,6 +2,7 @@
 using FileDrop.TL;
 using FileDrop.TL.Helpers;
 using FileDrop.TL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,12 +14,12 @@ using System.Threading.Tasks;
 namespace FileDrop.Controllers
 {
    [ApiController]
+   [Authorize]
    [Route("[controller]")]
    public class FileController : ControllerBase
    {
       private readonly IS3Logic _s3Logic;
       private readonly IFileLogic _fileLogic;
-      private static readonly string bucketName = "create-bucket-api-test6";
 
       public FileController(IS3Logic s3Logic, IFileLogic fileLogic)
       {
@@ -30,7 +31,7 @@ namespace FileDrop.Controllers
       [Route("GetFiles")]
       public IEnumerable<FileDTO> GetFiles()
       {
-         IList<FileDTO> filesDTO = _fileLogic.GetAllFiles();
+         IList<FileDTO> filesDTO = _fileLogic.GetAllFiles(ControllerHelper.GetIntRight(User, "UserId"));
          return filesDTO;
       }
 
@@ -40,7 +41,7 @@ namespace FileDrop.Controllers
       {
          List<IFormFile> files = Request.Form.Files.ToList();
          //Files are uploaded asynchronous, so they are uploaded one file per thread
-         AddFileResponse result = await _s3Logic.UploadFilesAsync(bucketName, files);
+         AddFileResponse result = await _s3Logic.UploadFilesAsync(ControllerHelper.GetStringRight(User, "UserBucketName"), files);
          IFormFile file = files.FirstOrDefault();
          if (result.StatusCode == HttpStatusCode.OK)
          {
@@ -51,7 +52,7 @@ namespace FileDrop.Controllers
                UploadDate = $"{DateTime.Now.ToLongDateString()} at {DateTime.Now.ToLongTimeString()}",
                StorageClass = "STANDARD",
                PreviewURL = result.PreSignedUrl.FirstOrDefault(),
-               UserId = 1
+               UserId = ControllerHelper.GetIntRight(User, "UserId")
             };
             _fileLogic.AddFileToDB(fileDTO);
          }
@@ -62,7 +63,7 @@ namespace FileDrop.Controllers
       [Route("DownloadFiles")]
       public async Task<IActionResult> DownloadFiles(string fileName)
       {
-         S3Response result = await _s3Logic.GetFileWithoutPathAsync(bucketName, fileName);
+         S3Response result = await _s3Logic.GetFileWithoutPathAsync(ControllerHelper.GetStringRight(User, "UserBucketName"), fileName);
 
          return File(result.File, "application/octet-stream", fileName);
       }

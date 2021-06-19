@@ -14,11 +14,13 @@ namespace FileDrop.Controllers
    {
       private readonly IAccountControllerHelper _accountControllerHelper;
       private readonly IS3Logic _s3Logic;
+      private readonly IAuthenticationLogic _authenticationLogic;
 
-      public AccountController(IAccountControllerHelper accountControllerHelper, IS3Logic s3Logic)
+      public AccountController(IAccountControllerHelper accountControllerHelper, IS3Logic s3Logic, IAuthenticationLogic authenticationLogic)
       {
          _accountControllerHelper = accountControllerHelper;
          _s3Logic = s3Logic;
+         _authenticationLogic = authenticationLogic;
       }
 
       [HttpPost]
@@ -37,6 +39,7 @@ namespace FileDrop.Controllers
 
          accountViewModel.Password = ControllerHelper.EncryptPassword(accountViewModel.Password);
          ApiResponse apiResult = await _accountControllerHelper.LoginAsync(accountViewModel);
+         _authenticationLogic.SaveJWToken(HttpContext, apiResult);
 
          return apiResult;
       }
@@ -76,7 +79,16 @@ namespace FileDrop.Controllers
       [Route("IsUserLoggedIn")]
       public bool IsUserLoggedIn()
       {
-         return Request.Cookies["fileDropAuthenticationToken"] != null;
+         string fileDropAuthenticationToken = Request.Cookies["fileDropAuthenticationToken"];
+         string fileDropAuthenticationRefreshToken = Request.Cookies["fileDropAuthenticationRefreshToken"];
+         if (fileDropAuthenticationToken == null)
+         {
+            if (fileDropAuthenticationRefreshToken == null)
+            {
+               return false;
+            }
+         }
+         return true;
       }
    }
 }

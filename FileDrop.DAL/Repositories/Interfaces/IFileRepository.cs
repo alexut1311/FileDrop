@@ -6,6 +6,6 @@ namespace FileDrop.DAL.Repositories.Interfaces
    public interface IFileRepository
    {
       void AddFile(FileDTO fileDTO);
-      IList<FileDTO> GetAllFiles();
+      IList<FileDTO> GetAllFiles(int userId);
    }
 }

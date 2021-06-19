@@ -6,6 +6,6 @@ namespace FileDrop.BL.Interfaces
    public interface IFileLogic
    {
       void AddFileToDB(FileDTO fileDTO);
-      IList<FileDTO> GetAllFiles();
+      IList<FileDTO> GetAllFiles(int userId);
    }
 }

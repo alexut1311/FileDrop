@@ -1,13 +1,18 @@
 using Amazon.S3;
 using FileDrop.BL.Classes;
+using FileDrop.BL.Helpers.Classes;
+using FileDrop.BL.Helpers.Interfaces;
 using FileDrop.BL.Interfaces;
 using FileDrop.ControllerHelpers.Classes;
 using FileDrop.ControllerHelpers.Interfaces;
 using FileDrop.DAL;
 using FileDrop.DAL.Repositories.Classes;
 using FileDrop.DAL.Repositories.Interfaces;
+using FileDrop.Middlewares;
 using FileDrop.Services.Classes;
 using FileDrop.Services.Interfaces;
+using FileDrop.TL.Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -15,6 +20,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace FileDrop
 {
@@ -38,12 +45,37 @@ namespace FileDrop
 
          services.AddTransient<IS3Logic, S3Logic>();
          services.AddTransient<IFileLogic, FileLogic>();
+         services.AddTransient<IAuthenticationLogic, AuthenticationLogic>();
+         services.AddTransient<IJWTokenHelper, JWTokenHelper>();
 
          services.AddSingleton<IS3Service, S3Service>();
 
          services.AddTransient<IFileRepository, FileRepository>();
 
          services.AddTransient<IAccountControllerHelper, AccountControllerHelper>();
+
+         services.AddAuthentication(x =>
+         {
+            x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+         }).AddJwtBearer(x =>
+         {
+            x.RequireHttpsMetadata = false;
+            x.SaveToken = false;
+            x.TokenValidationParameters = new TokenValidationParameters
+            {
+               ValidateIssuer = true,
+               ValidIssuer = ConfigurationHelper.GetKey("Issuer", "jwtSettings"),
+               ValidateAudience = true,
+               ValidAudience = ConfigurationHelper.GetKey("Audience", "jwtSettings"),
+               RequireExpirationTime = true,
+               RequireSignedTokens = true,
+               ValidateLifetime = true,
+               ValidateIssuerSigningKey = true,
+               IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationHelper.GetKey("SigningKey", "jwtSettings"))),
+               TokenDecryptionKey = new SymmetricSecurityKey(Encoding.Default.GetBytes(ConfigurationHelper.GetKey("EncryptyingSecurityKey", "jwtSettings"))),
+            };
+         });
 
          services.AddControllersWithViews().AddNewtonsoftJson();
 
@@ -71,8 +103,11 @@ namespace FileDrop
          app.UseHttpsRedirection();
          app.UseStaticFiles();
          app.UseSpaStaticFiles();
-
          app.UseRouting();
+
+         app.UseMiddleware<AuthenticationMiddleware>();
+         app.UseAuthentication();
+         app.UseAuthorization();
 
          app.UseEndpoints(endpoints =>
          {

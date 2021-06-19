@@ -1,14 +1,24 @@
 ﻿import React, { Component } from 'react';
 import { Loader } from './Loader';
 import { UploadPopUp } from './UploadPopUp';
+import { FilePreview } from './FilePreview';
 import DataGrid, {
    Column,
    Selection,
    FilterRow,
-   Paging,
-   ColumnChooser
+   ColumnChooser,
+   HeaderFilter,
+   Export,
+   Scrolling,
+   StateStoring,
+   ColumnFixing,
+   TotalItem,
+   Summary,
+   MasterDetail
 } from 'devextreme-react/data-grid';
-import $ from 'jquery';
+import ExcelJS from 'exceljs';
+import saveAs from 'file-saver';
+import { exportDataGrid } from 'devextreme/excel_exporter';
 
 export class FetchFiles extends Component {
    constructor(props) {
@@ -22,6 +32,7 @@ export class FetchFiles extends Component {
       this.onToolbarPreparing = this.onToolbarPreparing.bind(this);
       this.hideUploadPopup = this.hideUploadPopup.bind(this);
       this.refreshDataGrid = this.refreshDataGrid.bind(this);
+      this.onExporting = this.onExporting.bind(this);
    }
 
    componentDidMount() {
@@ -41,7 +52,6 @@ export class FetchFiles extends Component {
    }
 
    downloadFiles = () => {
-      debugger;
       document.location = this.state.selectedFiles[0].previewURL
 
       this.setState({
@@ -54,7 +64,6 @@ export class FetchFiles extends Component {
    }
 
    onSelectionChanged = (e) => {
-      debugger;
       this.setState({
          areSelectedFiles: e.selectedRowKeys.length !== 0,
          selectedFiles: e.component.getSelectedRowsData()
@@ -65,7 +74,6 @@ export class FetchFiles extends Component {
    }
 
    onToolbarPreparing(e) {
-      debugger;
       e.toolbarOptions.items.push({
          widget: 'dxButton',
          location: 'before',
@@ -96,6 +104,7 @@ export class FetchFiles extends Component {
          }
       );
    }
+
    refreshDataGrid(e) {
       if (this.dataGrid) {
          this.dataGrid.instance.refresh();
@@ -106,6 +115,22 @@ export class FetchFiles extends Component {
       this.getFiles();
    }
 
+   onExporting(e) {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Main sheet');
+
+      exportDataGrid({
+         component: e.component,
+         worksheet: worksheet,
+         autoFilterEnabled: true
+      }).then(() => {
+         workbook.xlsx.writeBuffer().then((buffer) => {
+            saveAs(new Blob([buffer], { type: 'application/octet-stream' }), 'DataGrid.xlsx');
+         });
+      });
+      e.cancel = true;
+   }
+
    renderFilesTable = (files) => {
       return (
          <div>
@@ -113,14 +138,22 @@ export class FetchFiles extends Component {
                uploadPopupVisible={this.state.uploadPopupVisible}
                hideUploadPopup={this.hideUploadPopup}
                refreshDataGrid={this.refreshDataGrid}
+               onExporting={this.onExporting}
             />
             <DataGrid id="gridContainer"
                ref={(ref) => this.dataGrid = ref}
                dataSource={files}
                showBorders={true}
+               allowColumnReordering={true}
+               allowColumnResizing={true}
+               columnAutoWidth={true}
+               showRowLines={true}
+               rowAlternationEnabled={true}
                keyExpr="id"
+               noDataText="No files"
                onToolbarPreparing={this.onToolbarPreparing}
                onSelectionChanged={this.onSelectionChanged}
+
             >
                <Selection
                   mode="single"
@@ -128,12 +161,25 @@ export class FetchFiles extends Component {
                   showCheckBoxesMode="always"
                />
                <FilterRow visible={true} />
-               <Paging defaultPageSize={30} />
+               <HeaderFilter visible={true} />
+               <Scrolling mode="infinite" />
+               <ColumnFixing enabled={true} />
+               <StateStoring enabled={true} type="localStorage" storageKey="storage" />
                <ColumnChooser enabled={true} />
-               <Column dataField="fileName" caption="Name" />
+               <Column dataField="fileName" caption="Name" fixed={true} sortOrder="asc"/>
                <Column dataField="fileSize" caption="Size" />
                <Column dataField="uploadDate" caption="LastModified" />
                <Column dataField="storageClass" caption="StorageClass" />
+               <Summary>
+                  <TotalItem
+                     column="fileName"
+                     summaryType="count" />
+               </Summary>
+               <Export enabled={true} allowExportSelectedData={true} />
+               <MasterDetail
+                  enabled={true}
+                  component={FilePreview}
+               />
             </DataGrid>
          </div>
       );
