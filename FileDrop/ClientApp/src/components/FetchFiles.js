@@ -52,7 +52,7 @@ export class FetchFiles extends Component {
    }
 
    downloadFiles = () => {
-      document.location = this.state.selectedFiles[0].previewURL
+      window.open(this.state.selectedFiles[0].previewURL, '_blank');
 
       this.setState({
          areSelectedFiles: false,

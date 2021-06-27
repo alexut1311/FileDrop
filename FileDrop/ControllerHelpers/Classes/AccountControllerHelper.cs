@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace FileDrop.ControllerHelpers.Classes
 {
@@ -23,8 +24,8 @@ namespace FileDrop.ControllerHelpers.Classes
 
             client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
-
-            HttpResponseMessage response = await client.GetAsync($"Authentication/Login?username={accountViewModel.Username}&password={accountViewModel.Password}");
+            var parameters = $"username={HttpUtility.UrlEncode(accountViewModel.Username)}&password={HttpUtility.UrlEncode(accountViewModel.Password)}";
+            HttpResponseMessage response = await client.GetAsync("Authentication/Login?" + parameters);
             client.Dispose();
             if (response.IsSuccessStatusCode)
             {

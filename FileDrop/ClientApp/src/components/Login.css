@@ -1,44 +1,77 @@
-﻿.root{
-    height:100vh;
+﻿.root {
+    height: 100vh;
 }
-.paper{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:78px;
+
+.paper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 78px;
 }
+
 .avatar {
     background-color: #f48fb1;
 }
-.form{
-    width:100%
-}
-.submit{
 
+.form {
+    width: 100%
 }
+
+.submit {
+}
+
 .login-background {
     background-color: #e6dfdf;
 }
+
 .image {
     background-image: url("https://source.unsplash.com/user/alex_serban7/likes");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: inherit;
 }
-.margin-left-40{
-    margin-left:50px !important;
+
+@media screen and (min-width: 2501px) and (max-width: 4000px) {
+    .margin-left-40 {
+        margin-left: 50px !important;
+    }
+    .sign-up {
+        width: 89%;
+        margin-left: 50px !important;
+    }
 }
-.sign-up {
-    width: 810px;
-    margin-left: 50px !important;
+
+@media screen and (min-width: 1600px) and (max-width: 2500px) {
+    .margin-left-40 {
+        margin-left: 40px !important;
+    }
+
+    .sign-up {
+        width: 89%;
+        margin-left: 40px !important;
+    }
 }
-.error{
-    color:red;
-    text-align:center;
+
+@media screen and (max-width: 1599px) {
+    .margin-left-40 {
+        margin-left: 30px !important;
+    }
+
+    .sign-up {
+        width: 89%;
+        margin-left: 30px !important;
+    }
 }
-.d-none{
-    display:none;
+
+.error {
+    color: red;
+    text-align: center;
 }
+
+.d-none {
+    display: none;
+}
+
 .success {
     color: green;
     text-align: center;
@@ -49,6 +82,5 @@
 }
 
 .sign-in .register-sign-in-message {
-    
     margin-right: 50px;
 }
